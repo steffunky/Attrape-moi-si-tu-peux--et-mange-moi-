@@ -10,18 +10,22 @@
  *
 **/
 
+
 #include "catch.hpp"
 
 
 namespace Jesuss
 {
+		
+#ifdef __unix__
 	
-	void ClearScreen ()
+	void ClearScreen()
 	{
 		cout << "\033[H\x1B[2J";
 	}
 	
-	/*void  ShowMatrix (const CMatrix & Mat)
+
+	void  ShowMatrix(const CMatrix &Mat)
 	{
 		ClearScreen();
 		cout << "\033[0m";
@@ -31,29 +35,48 @@ namespace Jesuss
 		{
 			for (char &j : i)
 			{
-				if (j == KTokenPlayer1) cout << "\033[" << ColorPlayer1 << "m" << j;
-				if (j == KTokenPlayer2) cout << "\033[" << ColorPlayer2 << "m" << j;
-				else cout << KEmpty;
+				if (j == KTokenPlayer1)
+					cout << "\033[" << ColorPlayer1 << "m" << j;
+				if (j == KTokenPlayer2) 
+					cout << "\033[" << ColorPlayer2<< "m" << j;
+				else
+					cout << KEmpty;
 				cout << '|';
 			}
+
 		    cout << endl;
 		}
 	}
-	*/
+
+#endif
+
+#ifdef __MINGW32__
 	
-	void ShowMatrix (const CMatrix & Mat)
+	void ClearScreen()
 	{
+		system("cls");
+	}
+	
+	void ShowMatrix(const CMatrix &Mat)
+	{
+		ClearScreen();
 		for (CVLine i : Mat)
 		{
 			for (char &j : i)
 			{
 				cout << j << '|';
 			}
+
 			cout << endl;
 		}
+
 	}
-	
-	void InitMat (CMatrix & Mat, unsigned NbLine, unsigned NbColumn, CPosition & PosPlayer1, CPosition & PosPlayer2)
+
+#endif
+
+	void InitMat (CMatrix &Mat, unsigned NbLine, unsigned NbColumn,
+				  CPosition &PosPlayer1,
+				  CPosition &PosPlayer2)
 	{
 		Mat.resize(NbLine);
 		for (CVLine &i : Mat)
@@ -64,11 +87,21 @@ namespace Jesuss
 				j = ' ';
 			}
 		}
+
 		Mat[PosPlayer1.second][PosPlayer1.first] = KTokenPlayer1;
 		Mat[PosPlayer2.second][PosPlayer2.first] = KTokenPlayer2;		
 	}
+
+	void clamp(const CMatrix &Mat, CPosition &Pos)
+	{
+		Pos.first = Pos.first >= Mat[0].size() ? Mat[0].size() - 1 : Pos.first;
+		Pos.first = Pos.first <= 0 ? 0 : Pos.first;
+		Pos.second = Pos.second >= Mat.size() ? Mat.size() - 1 : Pos.second;
+		Pos.second = Pos.second <= 0 ? 0 : Pos.second;
+		
+	}
 	
-	void MoveToken (CMatrix & Mat, char Move, CPosition  & Pos)
+	void MoveToken (CMatrix &Mat, char Move, CPosition &Pos)
 	{
 	    CPosition OldPos = Pos;
 		switch (toupper(Move))
@@ -102,28 +135,48 @@ namespace Jesuss
 			    ++Pos.second;
 				break;
 		}
-		swap(Mat[OldPos.second][OldPos.first], Mat[Pos.second][Pos.first]);
+
+		clamp(Mat, Pos);
+		/*if (Pos == PosPlayer1 || Pos == PosPlayer2)
+		{
+			Mat[Pos.second][Pos.first] = ' ';
+		}
+		else
+		{*/
+			swap(Mat[OldPos.second][OldPos.first], Mat[Pos.second][Pos.first]);
+			//}
 	}
 	
-	void ReadParamaters (map <string , unsigned> &Params)
+	void ReadParamaters (map <string, unsigned> &Params)
 	{ 
 		unsigned NbConfig;
-        ifstream ifs("Config.txt");
+        ifstream ifs("config.txt");
 		string LineConfig;
-        while (!ifs.eof ())
+        while (!ifs.eof())
         {
-			cout << "Coucou" << endl;
+			//cout << "Coucou" << endl;
 			ifs >> LineConfig;
-			LineConfig = LineConfig.substr (0, LineConfig.size () - 1);
+			LineConfig = LineConfig.substr (0, LineConfig.size() - 1);
 			ifs >> NbConfig;
 			Params[LineConfig] = NbConfig;
         }
 	}
 	
-	int Run ()
+	int Run()
 	{
 	    CMatrix Mat;
-		map <string , unsigned> Params;
+        map <string, unsigned> Params;
+		/* Default values */
+		/*
+		Params["NbLine"] = /* console width */;
+		/*Params["NbCol"] = /* console height*/;
+
+		/*	Params["XPosPlay1"] = Params["NbLine"] - 1;
+		Params["YPosPlay2"] = Params["NbCol"] - 1;
+
+		Params["YPosPlay1"] = 0;
+		Params["XPosPlay2"] = 0;*/
+
 		ReadParamaters (Params);
 		// unsigned NbLine;
 		// cin >> NbLine;
@@ -141,32 +194,39 @@ namespace Jesuss
 		PosPlayer2.first = Params["XPosPlay2"];
 		PosPlayer2.second = Params["YPosPlay2"];
 		
-		InitMat (Mat, Params["NbLine"], Params["NbCol"], PosPlayer1, PosPlayer2);
+		InitMat (Mat,
+				 Params["NbLine"],
+				 Params["NbCol"],
+				 PosPlayer1,
+				 PosPlayer2);
 		for (;;)
 		{
-			ShowMatrix (Mat);
 			char MovePlayer1;
-			cin >> MovePlayer1;
-			MoveToken (Mat, MovePlayer1, PosPlayer1);
-			ShowMatrix (Mat);
 			char MovePlayer2;
-			cin >> MovePlayer2;
+
+			ShowMatrix (Mat);
+			cout << "X1: " << PosPlayer1.first << " Y1: " << PosPlayer1.second << endl;
+			cout << "X2: " << PosPlayer2.first << " Y2: " << PosPlayer2.second << endl;
+			MovePlayer1 = getch();
+			MoveToken (Mat, MovePlayer1, PosPlayer1);
+
+			ShowMatrix (Mat);			
+			cout << "X1: " << PosPlayer1.first << " Y1: " << PosPlayer1.second << endl;
+			cout << "X2: " << PosPlayer2.first << " Y2: " << PosPlayer2.second << endl;
+			MovePlayer2 = getch();
 			MoveToken (Mat, MovePlayer2, PosPlayer2);
 		} 
 		return 0;
-	} 
+	}
 	
 
 }
-	 
-	// }
 
 
 
 using namespace Jesuss;	
 
-int main ()
+int main()
 {
-	Run ();
+	return Run();
 }
-
