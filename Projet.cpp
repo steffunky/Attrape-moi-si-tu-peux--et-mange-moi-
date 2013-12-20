@@ -54,7 +54,6 @@ namespace Jesuss
 			}
 		    cout << endl;
 		}
-		    cout << endl;
 	}
 
 #endif
@@ -109,9 +108,8 @@ namespace Jesuss
 	{
 		Pos.first = Pos.first >= Mat[0].size() ? Mat[0].size() - 1 : Pos.first;
 		Pos.first = Pos.first <= 0 ? 0 : Pos.first;
+		Pos.second = Pos.second == ~0 ? 0 : 0;
 		Pos.second = Pos.second >= Mat.size() ? Mat.size() - 1 : Pos.second;
-		Pos.second = Pos.second <= 0 ? 0 : Pos.second;
-		
 	}
 	
 	void MoveToken (CMatrix &Mat, char Move, CPosition &Pos)
@@ -150,7 +148,7 @@ namespace Jesuss
 		}
 
 		clamp(Mat, Pos);
-		/*if (Pos == PosPlayer1 || Pos == PosPlayer2)
+		/*if (OldPos != PosPlayer1 || Pos == PosPlayer2)
 		{
 			Mat[Pos.second][Pos.first] = ' ';
 		}
@@ -167,7 +165,6 @@ namespace Jesuss
 		string LineConfig;
         while (!ifs.eof())
         {
-			//cout << "Coucou" << endl;
 			ifs >> LineConfig;
 			LineConfig = LineConfig.substr (0, LineConfig.size() - 1);
 			ifs >> NbConfig;
@@ -180,15 +177,16 @@ namespace Jesuss
 	    CMatrix Mat;
         map <string, unsigned> Params;
 		/* Default values */
+		
+		/*  Params["NbLine"] = console width;   */
+		/*  Params["NbCol"] =  console height;  */
 		/*
-		Params["NbLine"] = /* console width */;
-		/*Params["NbCol"] = /* console height*/;
-
-		/*	Params["XPosPlay1"] = Params["NbLine"] - 1;
-		Params["YPosPlay2"] = Params["NbCol"] - 1;
-
-		Params["YPosPlay1"] = 0;
-		Params["XPosPlay2"] = 0;*/
+			Params["XPosPlay1"] = Params["NbLine"] - 1;
+			Params["YPosPlay2"] = Params["NbCol"] - 1;
+			
+			Params["YPosPlay1"] = 0;
+			Params["XPosPlay2"] = 0;
+		*/
 		ReadParamaters (Params);
 		
 		PosPlayer1.first = Params["XPosPlay1"];
@@ -227,8 +225,6 @@ namespace Jesuss
 	
 
 }
-
-
 
 using namespace Jesuss;	
 
