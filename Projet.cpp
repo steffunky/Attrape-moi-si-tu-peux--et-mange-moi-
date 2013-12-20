@@ -106,9 +106,9 @@ namespace Jesuss
 
 	void clamp(const CMatrix &Mat, CPosition &Pos)
 	{
-		Pos.first = Pos.first == ~0 ? 0 : Pos.first;
+		Pos.first = Pos.first == ~0U ? 0 : Pos.first;
 		Pos.first = Pos.first >= Mat[0].size() ? Mat[0].size() - 1 : Pos.first;
-		Pos.second = Pos.second == ~0 ? 0 : Pos.second;
+		Pos.second = Pos.second == ~0U ? 0 : Pos.second;
 		Pos.second = Pos.second >= Mat.size() ? Mat.size() - 1 : Pos.second;
 	}
 	
