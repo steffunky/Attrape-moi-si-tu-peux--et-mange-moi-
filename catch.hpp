@@ -17,7 +17,9 @@
 #include <iomanip>
 #include <cstdlib>
 #include <map>
+#ifdef __MINGW32__
 #include <conio.h>
+#endif
 
 using namespace std;
 

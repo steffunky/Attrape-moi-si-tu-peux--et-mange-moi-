@@ -21,14 +21,23 @@ namespace Jesuss
 	
 	void ClearScreen()
 	{
-		cout << "\033[H\x1B[2J";
+		cout << "\033[2J\033[1;1H";
 	}
 	
+	char GetKey()
+	{
+		char c;
+
+		system("stty cbreak -echo");
+		c = getchar();
+		system("stty cooked echo");
+		return c;
+	}
 
 	void  ShowMatrix(const CMatrix &Mat)
 	{
 		ClearScreen();
-		cout << "\033[0m";
+		write(1, "\033[0m",4);
 		unsigned ColorPlayer1 = 31;
 		unsigned ColorPlayer2 = 34;
 		for (CVLine i : Mat)
@@ -36,16 +45,16 @@ namespace Jesuss
 			for (char &j : i)
 			{
 				if (j == KTokenPlayer1)
-					cout << "\033[" << ColorPlayer1 << "m" << j;
-				if (j == KTokenPlayer2) 
-					cout << "\033[" << ColorPlayer2<< "m" << j;
+					cout << "\033[" << ColorPlayer1 << "m" << j << "\033[0m";
+				else if (j == KTokenPlayer2)
+					cout << "\033[" << ColorPlayer2 << "m" << j << "\033[0m";
 				else
-					cout << KEmpty;
+					cout << ' ';
 				cout << '|';
 			}
-
 		    cout << endl;
 		}
+		    cout << endl;
 	}
 
 #endif
@@ -72,6 +81,10 @@ namespace Jesuss
 
 	}
 
+	char GetKey()
+	{
+		return getch();
+	}
 #endif
 
 	void InitMat (CMatrix &Mat, unsigned NbLine, unsigned NbColumn,
@@ -176,18 +189,7 @@ namespace Jesuss
 
 		Params["YPosPlay1"] = 0;
 		Params["XPosPlay2"] = 0;*/
-
 		ReadParamaters (Params);
-		// unsigned NbLine;
-		// cin >> NbLine;
-		// unsigned NbColumn;
-		// cin >> NbColumn;
-		// CPosition PosPlayer1;
-		// cin >> PosPlayer1.first;
-		// cin >> PosPlayer1.second;
-		// CPosition PosPlayer2;
-		// cin >> PosPlayer2.first;
-		// cin >> PosPlayer2.second;
 		
 		PosPlayer1.first = Params["XPosPlay1"];
 		PosPlayer1.second = Params["YPosPlay1"];
@@ -207,15 +209,19 @@ namespace Jesuss
 			ShowMatrix (Mat);
 			cout << "X1: " << PosPlayer1.first << " Y1: " << PosPlayer1.second << endl;
 			cout << "X2: " << PosPlayer2.first << " Y2: " << PosPlayer2.second << endl;
-			MovePlayer1 = getch();
+
+			
+			MovePlayer1 = GetKey();
 			MoveToken (Mat, MovePlayer1, PosPlayer1);
 
 			ShowMatrix (Mat);			
 			cout << "X1: " << PosPlayer1.first << " Y1: " << PosPlayer1.second << endl;
 			cout << "X2: " << PosPlayer2.first << " Y2: " << PosPlayer2.second << endl;
-			MovePlayer2 = getch();
+			MovePlayer2 = GetKey();
 			MoveToken (Mat, MovePlayer2, PosPlayer2);
 		} 
+
+		cout << "penis" << endl;
 		return 0;
 	}
 	
