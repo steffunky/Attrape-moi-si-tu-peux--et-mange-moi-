@@ -272,7 +272,7 @@ namespace Jesuss
 		ifstream ifs("config.txt");
 		string LineConfig;
 
-		if(!ifs.is_open)
+		if(!ifs.is_open())
 			return;
 
 		while (!ifs.eof())
