@@ -27,15 +27,15 @@ namespace Jesuss
 	char GetKey()
 	{
 		char c;
-		system("stty cbreak -echo");
+		system("stty cbreak -echo"); // enleve la mise en tampon des caracteres et leur affichage dans le terminal quand on les tapes
 		c = getchar();
-		system("stty cooked echo");
+		system("stty cooked echo"); // restore dans l'etat normal
 		return c;
 	}
 
 	void  ShowMatrix(const CMatrix &Mat)
 	{
-		//ClearScreen();
+		ClearScreen();
 		write(1, "\033[0m",4);
 		unsigned ColorPlayer1 = 31;
 		unsigned ColorPlayer2 = 34;
@@ -55,6 +55,11 @@ namespace Jesuss
 		}
 		cout << endl;
 	}
+	
+	CPosition GetCmdInfo()
+	{
+		
+	}/* a faire*/
 
 #endif
 
@@ -64,7 +69,9 @@ namespace Jesuss
 	{
 		system("cls");
 	}
-	
+
+    /* A faire*/
+    /* Optimiser l'affichage de la matrice*/
 	void ShowMatrix(const CMatrix &Mat)
 	{
 		ClearScreen();
@@ -83,6 +90,19 @@ namespace Jesuss
 	{
 		return getch();
 	}
+
+	CPosition GetCmdInfo()
+	{
+		CPosition cmd;
+
+		CONSOLE_SCREEN_BUFFER_INFO cmdinfo;
+		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cmdinfo);
+		cmd.first = cmdinfo.srWindow.Right - cmdinfo.srWindow.Left + 1;
+		cmd.second = cmdinfo.srWindow.Bottom - cmdinfo.srWindow.Top + 1;
+
+		return cmd;
+	}
+
 #endif
 
 	void InitMat (CMatrix &Mat, unsigned NbLine, unsigned NbColumn, CPosition &PosPlayer1, CPosition &PosPlayer2)
@@ -95,7 +115,9 @@ namespace Jesuss
 			{
 				j = ' ';
 			}
+
 		}
+
 		Mat[PosPlayer1.second][PosPlayer1.first] = KTokenPlayer1;
 		Mat[PosPlayer2.second][PosPlayer2.first] = KTokenPlayer2;                
 	}
@@ -221,17 +243,27 @@ namespace Jesuss
 		/* si la valeur renvoyee est indivisible par 2 alors la partie est finie;
 		    si elle vaut 1, le j1 a gagner si elle vaut 3 j2 gagne*/
 	}
-        
+   
 	void SetDefaultParameters (map <string, unsigned> &Params)
 	{
-		Params["NbLine"];//console height voir conio.h pour win et autre pour linux
-		Params["NbCol"];//console width
+		CPosition cmdDims = GetCmdInfo();
+		
+		--cmdDims.first /= 2;
+		----cmdDims.second;
+		
+		Params["NbLine"] = cmdDims.second;
+		Params["NbCol"] = cmdDims.first;
 		Params["XPosPlay1"] = 0;
-		Params["YPosPlay1"] = Params["NbLines"] - 1;
-		Params["XPosPlay2"] = 0;
-		Params["YPosPlay2"] = Params["NbCol"] - 1;
+		Params["YPosPlay1"] = Params["NbLine"] - 1;
+		Params["XPosPlay2"] = Params["NbCol"] - 1;
+		Params["YPosPlay2"] = 0;
 		Params["nb_turns"] = 1;
 		Params["inf_turns"] = 0;
+	}
+
+	bool isdigit(char c)
+	{
+		return ('0' <= c && c <= '9');
 	}
 
     void ReadParameters (map <string, unsigned> &Params)
@@ -239,9 +271,17 @@ namespace Jesuss
 		unsigned NbConfig;
 		ifstream ifs("config.txt");
 		string LineConfig;
+
+		if(!ifs.is_open)
+			return;
+
 		while (!ifs.eof())
 		{
 			ifs >> LineConfig;
+
+			/* ignore comments in config file */
+			if(LineConfig[0] == '#' || isdigit(LineConfig[0]))
+				continue;
 			LineConfig = LineConfig.substr (0, LineConfig.size() - 1);
 			ifs >> NbConfig;
 			Params[LineConfig] = NbConfig;
@@ -263,28 +303,29 @@ namespace Jesuss
 
 		InitMat (Mat, Params["NbLine"], Params["NbCol"], PosPlayer1, PosPlayer2);
 
-		for (Params["nb_turns"] *= 2; (Params["nb_turns"] - Params["nb_turns"] % 2) * 2 != 0 && status % 2 == 0;)
+		ShowMatrix (Mat);
+		for (Params["nb_turns"] *= 2; Params["nb_turns"] != 0 && status % 2 == 0;)
 		{
 			char MovePlayer1;
-			ShowMatrix (Mat);
-			cout << status << endl;
 			MovePlayer1 = GetKey();
 			status = MoveTokenPlayers (Mat, MovePlayer1);
-			Params["nb_turns"] -= Params["infturns"];
+			ShowMatrix (Mat);
+			Params["nb_turns"] -= Params["infturns"] != 0;
 		}
 
 		switch(status >> 1)
 		{
 		case 0:
 			cout << "Bravo J1!" << endl;
+			break;
 		case 1:
 			cout << "Bravo J2!" << endl;
 		}
+
+		GetKey();
 		return 0;
     }
 }
-
-
 
 using namespace Jesuss;        
 
