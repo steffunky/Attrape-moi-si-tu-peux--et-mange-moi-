@@ -10,7 +10,8 @@
  *
 **/
 
-
+#include <typeinfo>
+#include <string>
 #include "catch.hpp"
 
 
@@ -19,6 +20,12 @@ namespace Jesuss
                 
 #ifdef __unix__
 	
+	typedef struct CmdWin
+	{
+		unsigned short lines;
+		unsigned short columns;
+	} t_cmdwin;
+
 	void ClearScreen()
 	{
 		cout << "\033[2J\033[1;1H";
@@ -56,10 +63,14 @@ namespace Jesuss
 		cout << endl;
 	}
     
-	CPosition GetCmdInfo()
+	void GetCmdInfo(CPosition &cmdinfo)
 	{
-		
-	}/* a faire*/
+		t_cmdwin cmd;
+
+		ioctl(1, TIOCGWINSZ, &cmd);
+		cmdinfo.first = cmd.columns;
+		cmdinfo.second = cmd.lines;
+	}
 	
 #endif
 	
@@ -91,16 +102,13 @@ namespace Jesuss
 		return getch();
 	}
 	
-	CPosition GetCmdInfo()
-	{
-		CPosition cmd;
-		
+	void GetCmdInfo(CPosition &cmd)
+	{	
 		CONSOLE_SCREEN_BUFFER_INFO cmdinfo;
 		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cmdinfo);
 		cmd.first = cmdinfo.srWindow.Right - cmdinfo.srWindow.Left + 1;
 		cmd.second = cmdinfo.srWindow.Bottom - cmdinfo.srWindow.Top + 1;
 		
-		return cmd;
 	}
 	
 #endif
@@ -246,7 +254,9 @@ namespace Jesuss
 	
 	void SetDefaultParameters (map <string, unsigned> &Params)
 	{
-		CPosition cmdDims = GetCmdInfo();
+		CPosition cmdDims;
+
+		GetCmdInfo(cmdDims);
 		--cmdDims.first /= 2;
 		----cmdDims.second;          
 		Params["NbLine"] = cmdDims.second;
@@ -257,7 +267,7 @@ namespace Jesuss
 		Params["YPosPlay2"] = 0;
 		Params["nb_turns"] = 1;
 		Params["inf_turns"] = 0;
-		Params["TurnPerTurn"] = 1;
+		Params["tpt"] = 1;
 	}
 	
 	bool isdigit(char c)
@@ -310,7 +320,7 @@ namespace Jesuss
 			char MovePlayer2;
 
 			MovePlayer1 = GetKey();
-			if (Params["TurnPerTurn"])
+			if (Params["tpt"])
 			{
 				MoveToken (Mat, MovePlayer1, PosPlayer1);
 				if (PosPlayer1 == PosPlayer2)
@@ -324,7 +334,7 @@ namespace Jesuss
 
 			ShowMatrix (Mat);
 			MovePlayer2 = GetKey();
-			if (Params["TurnPerTurn"])
+			if (Params["tpt"])
 			{
 				MoveToken (Mat, MovePlayer2, PosPlayer2);
 				if (PosPlayer1 == PosPlayer2)

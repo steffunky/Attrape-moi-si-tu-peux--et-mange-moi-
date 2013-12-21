@@ -21,6 +21,10 @@
 #include <iomanip>
 #include <cstdlib>
 #include <map>
+#ifdef __unix__
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#endif
 #ifdef __MINGW32__
 #include <conio.h>
 #include <windows.h>

@@ -1,6 +1,9 @@
-NbLine: 10
-NbCol: 10
-XPosPlay1: 0
-YPosPlay1: 9
-XPosPlay2: 9
-YPosPlay2: 0
+#NbLine: 10
+#NbCol: 10
+#XPosPlay1: 0
+#YPosPlay1: 9
+#XPosPlay2: 9
+#YPosPlay2: 0
+#nbturn: 1
+inf_turns: 0
+tpt: 0
