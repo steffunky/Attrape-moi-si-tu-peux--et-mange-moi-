@@ -10,6 +10,9 @@
  *
 **/
 
+#ifndef __CATCH_HPP__
+#define __CATCH_HPP__
+
 #include <cstdio>
 #include <iostream>
 #include <vector>
@@ -46,3 +49,5 @@ CPosition PosPlayer1;
 CPosition PosPlayer2;
 
 int status;
+
+#endif
