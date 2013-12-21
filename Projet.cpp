@@ -130,7 +130,7 @@ namespace Jesuss
                 Pos.second = Pos.second >= Mat.size() ? Mat.size() - 1 : Pos.second;
         }
 
-        unsigned MoveToken(CMatrix &Mat, char Move, CPosition &Pos)
+        void MoveToken(CMatrix &Mat, char Move, CPosition &Pos)
         {
                 CPosition OldPos = Pos;
                 switch (toupper(Move))
