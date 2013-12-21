@@ -10,6 +10,7 @@
  *
 **/
 
+#include <cstdio>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -19,6 +20,7 @@
 #include <map>
 #ifdef __MINGW32__
 #include <conio.h>
+#include <windows.h>
 #endif
 
 using namespace std;
