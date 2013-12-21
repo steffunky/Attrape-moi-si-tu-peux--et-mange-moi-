@@ -257,8 +257,8 @@ namespace Jesuss
 		Params["YPosPlay1"] = Params["NbLine"] - 1;
 		Params["XPosPlay2"] = Params["NbCol"] - 1;
 		Params["YPosPlay2"] = 0;
-		Params["nb_turns"] = 1;
-		Params["inf_turns"] = 0;
+		Params["nb_turns"] = Params["NbLine"] * Params["NbCol"];
+		Params["inf_turns"] = 1;
 	}
 
 	bool isdigit(char c)
