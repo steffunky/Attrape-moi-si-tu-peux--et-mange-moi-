@@ -10,22 +10,16 @@
  *
 **/
 
-#include <typeinfo>
-#include <string>
+
+
 #include "catch.hpp"
 
 
 namespace Jesuss
 {
-                
+	
 #ifdef __unix__
 	
-	typedef struct CmdWin
-	{
-		unsigned short lines;
-		unsigned short columns;
-	} t_cmdwin;
-
 	void ClearScreen()
 	{
 		cout << "\033[2J\033[1;1H";
@@ -43,7 +37,7 @@ namespace Jesuss
 	void  ShowMatrix(const CMatrix &Mat)
 	{
 		ClearScreen();
-		write(1, "\033[0m",4);
+		cout << "\033[0m";
 		unsigned ColorPlayer1 = 31;
 		unsigned ColorPlayer2 = 34;
 		for (CVLine i : Mat)
@@ -65,11 +59,10 @@ namespace Jesuss
     
 	void GetCmdInfo(CPosition &cmdinfo)
 	{
-		t_cmdwin cmd;
-
-		ioctl(1, TIOCGWINSZ, &cmd);
-		cmdinfo.first = cmd.columns;
-		cmdinfo.second = cmd.lines;
+		unsigned short cmd[2];
+		ioctl(1, TIOCGWINSZ, cmd);
+		cmdinfo.first = cmd[1];
+		cmdinfo.second = cmd[0];
 	}
 	
 #endif
@@ -141,6 +134,7 @@ namespace Jesuss
 	void MoveToken(CMatrix &Mat, char Move, CPosition &Pos)
 	{
 		CPosition OldPos = Pos;
+
 		switch (toupper(Move))
 		{
 		case 'A':
@@ -170,7 +164,6 @@ namespace Jesuss
 		case 'C':
 			++Pos.first;
 			++Pos.second;
-			break;
 		}
 		
 		clamp(Mat, Pos);
@@ -178,29 +171,30 @@ namespace Jesuss
 		swap (Mat[Pos.second][Pos.first] , Mat[OldPos.second][OldPos.first]);
 	}
 	
-	unsigned indexOf(const char Tab[], unsigned size, char value)
+	bool Contains(const char Tab[], unsigned size, char value)
 	{
 		for (unsigned i = 0; i < size; ++i)
 		{
 			if (Tab[i] == value)
-				return i;
+				return true;
 		}
 		
-		return size;
+		return false;
 	}
 	
 	unsigned MoveTokenPlayers(CMatrix &Mat, char Move)
 	{
-		constexpr char p1keys[] = {'A', 'Z', 'E', 'Q', 'D', 'W', 'X', 'C'};
-		constexpr char p2keys[] = {'R', 'T', 'Y', 'F', 'H', 'V', 'B', 'N'};
-		unsigned currentP = 0;
+		CPosition NewPos;
 		CPosition players[2];
+		unsigned currentP = 0;
+
 		players[0] = PosPlayer1;
 		players[1] = PosPlayer2;
 		
-		if(indexOf(p2keys, 8, toupper(Move)) != 8)
+		if(Contains(p2keys, 8, toupper(Move)))
 			++currentP;
-		CPosition NewPos = currentP == 0 ? PosPlayer1 : PosPlayer2;
+
+		NewPos = currentP == 0 ? PosPlayer1 : PosPlayer2;
 		switch (toupper(Move))
 		{
 		case p1keys[0]:
@@ -238,7 +232,6 @@ namespace Jesuss
 		case p2keys[7]:
 			++NewPos.first;
 			++NewPos.second;
-			break;
 		}
 		
 		clamp(Mat, NewPos);
@@ -246,11 +239,9 @@ namespace Jesuss
 			Mat[NewPos.second][NewPos.first] = ' ';
 		swap(Mat[players[currentP].second][players[currentP].first], Mat[NewPos.second][NewPos.first]);
 		currentP == 0 ? PosPlayer1 = NewPos : PosPlayer2 = NewPos;
-		
-		return ((PosPlayer1 == PosPlayer2) + (currentP << 1));
-		/* si la valeur renvoyee est indivisible par 2 alors la partie est finie;
-		   si elle vaut 1, le j1 a gagner si elle vaut 3 j2 gagne*/
-	}
+
+		return currentP;
+}
 	
 	void SetDefaultParameters (map <string, unsigned> &Params)
 	{
@@ -258,7 +249,8 @@ namespace Jesuss
 
 		GetCmdInfo(cmdDims);
 		--cmdDims.first /= 2;
-		----cmdDims.second;          
+		----cmdDims.second;
+          
 		Params["NbLine"] = cmdDims.second;
 		Params["NbCol"] = cmdDims.first;
 		Params["XPosPlay1"] = 0;
@@ -291,6 +283,7 @@ namespace Jesuss
 			/* ignore comments in config file */
 			if(LineConfig[0] == '#' || isdigit(LineConfig[0]))
 				continue;
+
 			LineConfig = LineConfig.substr (0, LineConfig.size() - 1);
 			ifs >> NbConfig;
 			Params[LineConfig] = NbConfig;
@@ -300,11 +293,13 @@ namespace Jesuss
     int Run()
     {
         CMatrix Mat;
+		char Move;
+		int i = 0;
 		map <string, unsigned> Params;
-		
+
 		SetDefaultParameters(Params);
 		ReadParameters (Params);
-		
+
 		PosPlayer1.first = Params["XPosPlay1"];
 		PosPlayer1.second = Params["YPosPlay1"];
 		PosPlayer2.first = Params["XPosPlay2"];
@@ -313,50 +308,37 @@ namespace Jesuss
 		InitMat (Mat, Params["NbLine"], Params["NbCol"], PosPlayer1, PosPlayer2);
 		
 		ShowMatrix (Mat);
-				
-		for (Params["nb_turns"] *= 2; Params["nb_turns"] != 0 && status % 2 == 0; ShowMatrix (Mat))
-		{
-			char MovePlayer1;
-			char MovePlayer2;
 
-			MovePlayer1 = GetKey();
+		for (Params["nb_turns"] *= 2;cout << i << endl && (Move = GetKey()) && Params["nb_turns"] != 0; ShowMatrix (Mat))
+		{
 			if (Params["tpt"])
 			{
-				MoveToken (Mat, MovePlayer1, PosPlayer1);
-				if (PosPlayer1 == PosPlayer2)
-				{
-					status = 1;
-					break;
-				}
+				CPosition &currPlayer = ++i % 2 == 0 ? PosPlayer2 : PosPlayer1;
+				MoveToken (Mat, Move, currPlayer);
 			}
 			else
-				status = MoveTokenPlayers (Mat, MovePlayer1);
+				status = MoveTokenPlayers (Mat, Move);
 
-			ShowMatrix (Mat);
-			MovePlayer2 = GetKey();
-			if (Params["tpt"])
+			if (PosPlayer1 == PosPlayer2 || !Params["nb_turns"])
 			{
-				MoveToken (Mat, MovePlayer2, PosPlayer2);
-				if (PosPlayer1 == PosPlayer2)
-					status = 3;
+				ShowMatrix (Mat);
+				status = Mat[PosPlayer1.second][PosPlayer1.first] == 'O';
+				break;
 			}
-			else
-				status = MoveTokenPlayers (Mat, MovePlayer1);
 
-			Params["nb_turns"] -= Params["inf_turns"] != 0;
+			Params["nb_turns"] -= Params["inf_turns"] != 0 && PosPlayer1 != PosPlayer2;
 		}
-		
-		switch(status >> 1)
-		{
-		case 0:
-			cout << string(Params["NbCol"] - 4, ' ') << "Bravo J1!" << endl;
-			break;
-		case 1:
-			cout << string(Params["NbCol"] - 4, ' ') << "Bravo J2!" << endl;
-		}
-		
+
+		cout << string(Params["NbCol"] - 4, ' ');
+
+		if(Params["nb_turns"])
+			cout << "Bravo J" << (char)((status) + '1') 
+				 << '!' << endl;
+		else
+			cout << "Egalite!" << endl;
+
 		GetKey();
-		return 0;
+		return status;
     }
 }
 
@@ -366,3 +348,4 @@ int main()
 {
 	return Run();
 }
+

@@ -13,6 +13,7 @@
 #ifndef __CATCH_HPP__
 #define __CATCH_HPP__
 
+#include <string>
 #include <cstdio>
 #include <iostream>
 #include <vector>
@@ -35,6 +36,10 @@ using namespace std;
 typedef vector <char> CVLine;
 typedef vector <CVLine> CMatrix;
 typedef pair   <unsigned, unsigned> CPosition;
+
+
+constexpr char p1keys[] = {'A', 'Z', 'E', 'Q', 'D', 'W', 'X', 'C'};
+constexpr char p2keys[] = {'R', 'T', 'Y', 'F', 'H', 'V', 'B', 'N'};
 
 const char KTokenPlayer1 = 'X';
 const char KTokenPlayer2 = 'O';
