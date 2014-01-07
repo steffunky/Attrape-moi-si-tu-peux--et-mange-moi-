@@ -30,7 +30,7 @@
 #include <conio.h>
 #include <windows.h>
 #endif
-
+#include <cassert>
 using namespace std;
 
 typedef vector <char> CVLine;
