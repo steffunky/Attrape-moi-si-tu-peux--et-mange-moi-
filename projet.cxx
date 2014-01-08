@@ -1,6 +1,6 @@
 /**
  *
- *@file : Projet.cpp
+ *@file : projet.cxx
  *
  *@author : Mickael BRUNEL, Anthony ALEGRE, Nabil BOUTEMEUR, Stéphen ABELLO
  *
@@ -16,11 +16,10 @@
 #define NDEBUG
 #endif
 
-#include "catch.hpp"
+#include "catch.hxx"
 
 namespace Jesuss
 {
-
 
 #ifdef __unix__
 	/**
@@ -34,21 +33,23 @@ namespace Jesuss
 
 	/**
 	 *
-	 *@brief : Return the pressed key without having to press enter on unix.
+	 *@brief : Returns the pressed key without having to press enter on unix.
 	 *
 	 **/
     char GetKey()
     {
         char c;
-        system("stty cbreak -echo"); // disables stdin buffering and echoing
+		int i; // ignoring return value...
+        i = system("stty cbreak -echo"); // disables stdin buffering and echoing
         c = getchar();
-        system("stty cooked echo"); // restores the terminal in its normal state
-        return c;
+        i = system("stty cooked echo"); // restores the terminal in its normal state
+        (void)i;
+		return c;
     }// GetKey()
 	/**
 	 *
-	 *@brief : Display the arena on unix.
-	 *
+	 *@brief : Display the arena on the terminal.
+	 *@param[in] : Mat The Matrix to display.
 	 **/
     void ShowMatrix(const CMatrix &Mat)
     {
@@ -75,13 +76,13 @@ namespace Jesuss
     }// ShowMatrix()
 	/**
 	 *
-	 *@brief : Get the terminal's size's information and use it to dimension the arena on unix. 
+	 *@brief : Get the terminal's size.
 	 *
 	 **/
     void GetCmdInfo(CPosition &cmdinfo)
     {
         unsigned short cmd[2]; // abstraction of the ttysize struct
-        ioctl(1, TIOCGWINSZ, cmd);
+        ioctl(1, TERM_SIZE, cmd);
         assert(cmd[0] >= 5 && cmd[1] >= 5);
         //5x5 are the minimal dimensions
         cmdinfo.first = cmd[1] >= 5 ? cmd[1] : 5;
@@ -93,7 +94,7 @@ namespace Jesuss
 #ifdef __MINGW32__
 	/**
 	 *
-	 *@brief : Clear the cmd terminal
+	 *@brief : Clears the terminal
 	 *
 	 **/
     void ClearScreen()
@@ -103,22 +104,26 @@ namespace Jesuss
 
 	/**
 	 *
-	 *@brief : Display the arena on windows.
-	 *
+	 *@brief : Displays the board on windows.
+	 *@param[in] Mat : The Matrix to display.
 	 **/
     void ShowMatrix(const CMatrix &Mat)
     {
         ClearScreen();
+		string matrixTxt;
         for (CVLine i : Mat)
-        {
+		{
             for (char j : i)
-            {
-                cout << j << '|';
-            }
-
-            cout << endl;
-        }
+                matrixTxt += j + '|';
+            matrixTxt += '\n';
+		}
+		/* 
+		   The matrix is cached in a string before being displayed
+		   to reduce print time.
+		 */
+		cout << matrixTxt;
     }// ShowMatrix()
+
 	/**
 	 *
 	 *@brief : Return the pressed key without having to press enter on windows.
@@ -137,18 +142,22 @@ namespace Jesuss
     void GetCmdInfo(CPosition &cmd)
     {
         CONSOLE_SCREEN_BUFFER_INFO cmdinfo;
+
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cmdinfo);
+
         cmd.first = cmdinfo.srWindow.Right - cmdinfo.srWindow.Left + 1;
         cmd.second = cmdinfo.srWindow.Bottom - cmdinfo.srWindow.Top + 1;
         assert(cmd.first >= 5 && assert cmd.second >= 5);
+
         cmd.second = cmd.second >= 5 ? cmd.second : 5;
         cmd.first = cmd.first >= 5 ? cmd.first : 5;
     }// GetCmdInfo
 
 #endif
+
 	/**
 	 *
-	 *@brief : Initialization of the matrix with parameters and put spaces in all box and put Players' tokens on the right places. 
+	 *@brief : Initializes the matrix.
 	 *
 	 **/
     void InitMat (CMatrix &Mat, unsigned NbLine, unsigned NbColumn, CPosition &PosPlayer1, CPosition &PosPlayer2)
@@ -158,11 +167,9 @@ namespace Jesuss
         {
             i.resize(NbColumn);
             for (char &j : i)
-            {
-                j = ' ';
-            }
-
+				j = ' ';
         }
+
         /* Sets the tokens on the board */
         assert(PosPlayer1.second < Mat.size() && PosPlayer2.second < Mat.size());
         assert(PosPlayer1.first < Mat[0].size() && PosPlayer2.first < Mat[0].size());
@@ -173,7 +180,7 @@ namespace Jesuss
 
 	/**
 	 *
-	 *@brief : Compare the token position with its next position and if the token will go out of the arena, clamp will keep its previous position as actual position. 
+	 *@brief : Prevents a player from going outside the board
 	 *
 	 **/
     void clamp(const CMatrix &Mat, CPosition &Pos)
@@ -192,7 +199,7 @@ namespace Jesuss
 
 	/**
 	 *
-	 *@brief : Move the players' token according to the pressed key (Used in Turn Based mod).
+	 *@brief : Move the player's token according to the pressed key (Used in Turn Based mod).
 	 *
 	 **/
     void MoveToken(CMatrix &Mat, char Move, CPosition &Pos)
@@ -236,12 +243,6 @@ namespace Jesuss
 		*/
         clamp(Mat, Pos);
 
-        /* 
-		   if (OldPos != Pos)
-		   Mat[Pos.second][Pos.first] = ' ';
-
-		   swap (Mat[Pos.second][Pos.first] ,Mat[OldPos.second][OldPos.first]);
-		*/
         if(OldPos != Pos)//Prevents the player of deleting himself in case of his position got clamped
         {
             Mat[Pos.second][Pos.first] = Mat[OldPos.second][OldPos.first];
@@ -278,7 +279,7 @@ namespace Jesuss
         /* The move is player 1... */
         unsigned currentP = 0;
 
-        /* ... unless the key pressed belong to player 2*/
+        /* ... unless the pressed key belongs to player 2*/
         if(Contains(p2keys, 8, toupper(Move)))
             ++currentP;
 
@@ -343,7 +344,6 @@ namespace Jesuss
 	 *@brief : Set basical parameters and if they are not in the config file, they wont be replaced.
 	 *
 	 **/	
-
     void SetDefaultParameters (map <string, unsigned> &Params)
     {
         CPosition cmdDims;
@@ -363,7 +363,8 @@ namespace Jesuss
         Params["nb_turns"] = 1;
         Params["inf_turns"] = 0;
         Params["tpt"] = 1;
-        
+		Params["menu"] = 0;
+
     }// SetDefaultParameters()
 
 	/**
@@ -404,31 +405,123 @@ namespace Jesuss
             Params[LineConfig] = NbConfig;
         }
     }// ReadParameters()
+
 	/**
-	*
-	*@brief : Menu to choose Game mod.
-	*
-	**/
-	void GameMenu(map <string,unsigned> &Params, bool &Exit)
+	 *
+	 *@brief : Menu to choose Game mode.
+	 *
+	 **/
+	void GameMenu(map <string,unsigned> &Params)
     {
         cout << "     WELCOME \n  IN THE ARENA\n\n";
-    	char GameMod;
 		cout << "Select a game mod\nT : Turn based game\nD : Dynamic game\nOther : Exit" << endl;
-		GameMod=GetKey();
-		switch(toupper(GameMod))
+
+		switch(toupper(GetKey()))
 		{
-			case 'T':
-				Params["tpt"]=1;
-				break;
-			case 'D':
-				Params["tpt"]=0;
-				break;
-			default:
-				Exit=true;
-				break;	
+		case 'T':
+			Params["tpt"] = 1;
+			break;
+		case 'D':
+			Params["tpt"] = 0;
+			break;
+		default:
+			exit(-1);
 		}
 		
     }	
+
+	pair<int, int> Substract(CPosition arg1, CPosition arg2)
+	{
+		pair<int, int> tmp;
+		tmp.first = int(arg1.first - arg2.first);
+		tmp.second = int(arg1.second - arg2.second);
+		return tmp;
+	}
+
+	char IAPlay()
+	{
+		/*
+		  The AI determines if the minimal number of keys to be pressed is odd or even
+		  then proceeds to move towards the enemy in a way that'll make him win.
+		 */
+		usleep(500000);
+
+		int steps = 0;
+		pair <int, int> tmp = Substract(PosPlayer2, PosPlayer1);
+		int loc;
+		/*
+		  If the two members of tmp are strictly positive, then the IA is above and nearer to the right than the enemy loc=2
+		  if only .first is negative, then the IA is above and near to the left loc = 1
+		  if only .second is negative, then the IA is in the lower right loc = 2
+		  else he's in the lower left loc = 3
+		  if one of the two member is equal to 0, then he's aligned
+		 */
+		loc = ((tmp.second < 0) * 2) + (tmp.first < 0);
+		switch(loc)
+		{
+		case 0: // bot right
+			while(tmp.first * tmp.second)
+			{
+				--tmp.first;
+				--tmp.second;
+				++steps;
+			}
+		case 1: // bot left
+			while(tmp.first * tmp.second)
+			{
+				++tmp.first;
+				--tmp.second;
+				++steps;
+			}
+		case 2: // +- top right
+			while(tmp.first * tmp.second)
+			{
+				--tmp.first;
+				++tmp.second;
+				++steps;
+			}
+		case 3: //-- top left
+			while(tmp.first * tmp.second)
+			{
+				++tmp.first;
+				++tmp.second;
+				++steps;
+			}
+		}
+
+		steps += tmp.first + tmp.second;
+
+		if(steps % 2)
+		{
+			switch(loc)
+			{
+			case 0:
+				return 'A';
+			case 1:
+				return 'E';
+			case 2:
+				return 'W';
+			case 3:
+				return 'C';
+			}
+		}
+		else
+		{
+			switch(loc)
+			{
+			case 0:
+				return tmp.second  == 0 ? 'D': 'Q';
+			case 1:
+				return 'Q';
+			case 2:
+				return tmp.first  == 0 ? 'Z': 'X';
+			case 3:
+				return 'D';
+			}
+		}
+
+		return 'X';//42
+	}
 
 
 
@@ -441,15 +534,13 @@ namespace Jesuss
     {
         CMatrix Mat;
         char Move;
-        int i = 0;
         map <string, unsigned> Params;
 
+        int i = 0;
         SetDefaultParameters(Params);
         ReadParameters(Params);
-		
-		bool Exit = false;
-		GameMenu(Params, Exit);	
-		if (Exit) return 0;		
+
+		if(Params["menu"]) GameMenu(Params);
 	
         PosPlayer1.first = Params["XPosPlay1"];
         PosPlayer1.second = Params["YPosPlay1"];
@@ -465,12 +556,15 @@ namespace Jesuss
         {
             if (Params["tpt"])
             {
-                while(Move = GetKey() && Contains(p1keys, 8, toupper(Move)));
+				if(Params["ia"] && i % 2 == 1)
+					Move = IAPlay();
+				else
+					while((Move = GetKey()) && !Contains(p1keys, 8, toupper(Move)));
                 MoveToken(Mat, Move, ++i % 2 == 0 ? PosPlayer2 : PosPlayer1);
-            }/*Given the number of turns elapsed, we move p2 or p1*/
+            }
             else
                 (Move = GetKey()) && (status = MoveTokenPlayers(Mat, Move));
-            Params["nb_turns"] -= Params["inf_turns"] && PosPlayer1 != PosPlayer2;
+            Params["nb_turns"] -= Params["inf_turns"] != 0 && PosPlayer1 != PosPlayer2;
         }
 
         status = Mat[PosPlayer1.second][PosPlayer1.first] == 'O'; /*status = 1 if p2 wins otherwise 0 */
@@ -485,10 +579,9 @@ namespace Jesuss
             cout << "Egalite!" << endl;
 
         GetKey();// prevent from exiting brutally
-        ClearScreen();
+        //ClearScreen();
         return status;
     }
-
 }
 
 using namespace Jesuss;
@@ -500,6 +593,5 @@ using namespace Jesuss;
  **/	
 int main()
 {
-	assert(false);
     return Run();
 }

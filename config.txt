@@ -6,4 +6,5 @@ XPosPlay2: 9
 YPosPlay2: 0
 #nb_turns: 50
 inf_turns: 0
-tpt: 0
+tpt: 1
+ia: 1

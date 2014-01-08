@@ -14,23 +14,24 @@
 #define __CATCH_HPP__
 
 #include <string>
-#include <cstdio>
 #include <iostream>
 #include <vector>
-#include <string>
 #include <fstream>
-#include <iomanip>
-#include <cstdlib>
 #include <map>
+#include <unistd.h>
+
 #ifdef __unix__
-#include <sys/types.h>
 #include <sys/ioctl.h>
+#define TERM_SIZE 0x5413
 #endif
+
 #ifdef __MINGW32__
-#include <conio.h>
 #include <windows.h>
+int getch();
 #endif
+
 #include <cassert>
+
 using namespace std;
 
 typedef vector <char> CVLine;
@@ -53,6 +54,8 @@ const string KJaune  = "33";
 const string KBleu   = "34";
 const string KMAgenta= "35";
 const string KCyan   = "36";
+
+int system(const char *command);
 
 CPosition PosPlayer1;
 CPosition PosPlayer2;
