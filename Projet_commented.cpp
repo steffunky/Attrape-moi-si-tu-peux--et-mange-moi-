@@ -1,14 +1,14 @@
 /**
-*
-*@file : Projet.cpp
-*
-*@author : Mickael BRUNEL, Anthony ALEGRE, Nabil BOUTEMEUR, Stéphen ABELLO
-*
-*@date : 18/12/2013
-*
-*@brief : Funny and fonctionnal game
-*
-**/
+ *
+ *@file : Projet.cpp
+ *
+ *@author : Mickael BRUNEL, Anthony ALEGRE, Nabil BOUTEMEUR, Stéphen ABELLO
+ *
+ *@date : 18/12/2013
+ *
+ *@brief : Funny and fonctionnal game
+ *
+ **/
 
 
 
@@ -23,8 +23,8 @@ namespace Jesuss
 
 #ifdef __unix__
 	/**
-	*@brief : Outputs a reset escape code for VT-100 terminals.
-	**/
+	 *@brief : Outputs a reset escape code for VT-100 terminals.
+	 **/
     void ClearScreen()
     {
         cout << "\033[2J\033[1;1H";
@@ -32,24 +32,23 @@ namespace Jesuss
     }// ClearScreen()
 
 	/**
-	*
-	*@brief : Return the pressed key without having to press enter on unix.
-	*
-	**/
+	 *
+	 *@brief : Return the pressed key without having to press enter on unix.
+	 *
+	 **/
     char GetKey()
     {
         char c;
         system("stty cbreak -echo"); // disables stdin buffering and echoing
         c = getchar();
-        assert('A' <= toupper(c) && toupper(c) <= 'Z');
         system("stty cooked echo"); // restores the terminal in its normal state
         return c;
     }// GetKey()
 	/**
-	*
-	*@brief : Display the arena on unix.
-	*
-	**/
+	 *
+	 *@brief : Display the arena on unix.
+	 *
+	 **/
     void ShowMatrix(const CMatrix &Mat)
     {
         ClearScreen();
@@ -74,10 +73,10 @@ namespace Jesuss
         cout << endl;
     }// ShowMatrix()
 	/**
-	*
-	*@brief : Get the terminal's size's information and use it to dimension the arena on unix. 
-	*
-	**/
+	 *
+	 *@brief : Get the terminal's size's information and use it to dimension the arena on unix. 
+	 *
+	 **/
     void GetCmdInfo(CPosition &cmdinfo)
     {
         unsigned short cmd[2]; // abstraction of the ttysize struct
@@ -92,20 +91,20 @@ namespace Jesuss
 
 #ifdef __MINGW32__
 	/**
-	*
-	*@brief : Clear the cmd terminal
-	*
-	**/
+	 *
+	 *@brief : Clear the cmd terminal
+	 *
+	 **/
     void ClearScreen()
     {
         system("cls");
     }// ClearScreen()
 
 	/**
-	*
-	*@brief : Display the arena on windows.
-	*
-	**/
+	 *
+	 *@brief : Display the arena on windows.
+	 *
+	 **/
     void ShowMatrix(const CMatrix &Mat)
     {
         ClearScreen();
@@ -120,20 +119,20 @@ namespace Jesuss
         }
     }// ShowMatrix()
 	/**
-	*
-	*@brief : Return the pressed key without having to press enter on windows.
-	*
-	**/
+	 *
+	 *@brief : Return the pressed key without having to press enter on windows.
+	 *
+	 **/
     char GetKey()
     {
         return getch();
     }// GetKey()
 
 	/**
-	*
-	*@brief : Get the terminal's size's information and use it to dimension the arena on windows. 
-	*
-	**/
+	 *
+	 *@brief : Get the terminal's size's information and use it to dimension the arena on windows. 
+	 *
+	 **/
     void GetCmdInfo(CPosition &cmd)
     {
         CONSOLE_SCREEN_BUFFER_INFO cmdinfo;
@@ -147,10 +146,10 @@ namespace Jesuss
 
 #endif
 	/**
-	*
-	*@brief : Initialization of the matrix with parameters and put spaces in all box and put Players' tokens on the right places. 
-	*
-	**/
+	 *
+	 *@brief : Initialization of the matrix with parameters and put spaces in all box and put Players' tokens on the right places. 
+	 *
+	 **/
     void InitMat (CMatrix &Mat, unsigned NbLine, unsigned NbColumn, CPosition &PosPlayer1, CPosition &PosPlayer2)
     {
         Mat.resize(NbLine);
@@ -172,18 +171,18 @@ namespace Jesuss
     }// InitMat()
 
 	/**
-	*
-	*@brief : Compare the token position with its next position and if the token will go out of the arena, clamp will keep its previous position as actual position. 
-	*
-	**/
+	 *
+	 *@brief : Compare the token position with its next position and if the token will go out of the arena, clamp will keep its previous position as actual position. 
+	 *
+	 **/
     void clamp(const CMatrix &Mat, CPosition &Pos)
     {
 
         /*
-~OU: ~ is a NOT operator, which toggles the bit of the unary expression 0,
-which returns the maximum value for an unsigned integrer. The U specifies
-this integrer is unsigned.
-*/
+		  ~OU: ~ is a NOT operator, which toggles the bit of the unary expression 0,
+		  which returns the maximum value for an unsigned integrer. The U specifies
+		  this integrer is unsigned.
+		*/
         Pos.first = Pos.first == ~0U ? 0 : Pos.first;
         Pos.first = Pos.first >= Mat[0].size() ? Mat[0].size() - 1 : Pos.first;
         Pos.second = Pos.second == ~0U ? 0 : Pos.second;
@@ -191,10 +190,10 @@ this integrer is unsigned.
     }// clamp()
 
 	/**
-	*
-	*@brief : Move the players' token according to the pressed key (Used in Turn Based mod).
-	*
-	**/
+	 *
+	 *@brief : Move the players' token according to the pressed key (Used in Turn Based mod).
+	 *
+	 **/
     void MoveToken(CMatrix &Mat, char Move, CPosition &Pos)
     {
         CPosition OldPos = Pos; //We save the old position
@@ -231,16 +230,17 @@ this integrer is unsigned.
         }
 
         /*
-Checks if the newly calculated position Pos is invalid.
-eg: Out of bounds
-*/
+		  Checks if the newly calculated position Pos is invalid.
+		  eg: Out of bounds
+		*/
         clamp(Mat, Pos);
 
-/* if (OldPos != Pos)
-Mat[Pos.second][Pos.first] = ' ';
+        /* 
+		   if (OldPos != Pos)
+		   Mat[Pos.second][Pos.first] = ' ';
 
-swap (Mat[Pos.second][Pos.first] ,Mat[OldPos.second][OldPos.first]);
-*/
+		   swap (Mat[Pos.second][Pos.first] ,Mat[OldPos.second][OldPos.first]);
+		*/
         if(OldPos != Pos)//Prevents the player of deleting himself in case of his position got clamped
         {
             Mat[Pos.second][Pos.first] = Mat[OldPos.second][OldPos.first];
@@ -249,10 +249,10 @@ swap (Mat[Pos.second][Pos.first] ,Mat[OldPos.second][OldPos.first]);
     }
 
 	/**
-	*
-	*@brief : Check if the char is in the char tab.
-	*
-	**/
+	 *
+	 *@brief : Check if the char is in the char tab.
+	 *
+	 **/
     bool Contains(const char Tab[], unsigned size, char value)
     {
         for (unsigned i = 0; i < size; ++i)
@@ -265,10 +265,10 @@ swap (Mat[Pos.second][Pos.first] ,Mat[OldPos.second][OldPos.first]);
     }
 
 	/**
-	*
-	*@brief : Move the players' token according to the pressed key (Used in dynamic mod).
-	*
-	**/
+	 *
+	 *@brief : Move the players' token according to the pressed key (Used in dynamic mod).
+	 *
+	 **/
     unsigned MoveTokenPlayers(CMatrix &Mat, char Move)
     {
         CPosition NewPos;
@@ -291,45 +291,41 @@ swap (Mat[Pos.second][Pos.first] ,Mat[OldPos.second][OldPos.first]);
         case p1keys[0]:
         case p2keys[0]:
             --NewPos.second;
-            --NewPos.first;
-            break;
+		--NewPos.first;
+		break;
         case p1keys[1]:
         case p2keys[1]:
             --NewPos.second;
-            break;
+		break;
         case p1keys[2]:
         case p2keys[2]:
             --NewPos.second;
-            ++NewPos.first;
-            break;
+		++NewPos.first;
+		break;
         case p1keys[3]:
         case p2keys[3]:
             --NewPos.first;
-            break;
+		break;
         case p1keys[4]:
         case p2keys[4]:
             ++NewPos.first;
-            break;
+		break;
         case p1keys[5]:
         case p2keys[5]:
             ++NewPos.second;
-            --NewPos.first;
-            break;
+		--NewPos.first;
+		break;
         case p1keys[6]:
         case p2keys[6]:
             ++NewPos.second;
-            break;
+		break;
         case p1keys[7]:
         case p2keys[7]:
             ++NewPos.first;
-            ++NewPos.second;
+		++NewPos.second;
         }
 
         clamp(Mat, NewPos);
-/* if (NewPos != players[currentP])
-Mat[NewPos.second][NewPos.first] = ' ';
-swap(Mat[players[currentP].second][players[currentP].first], Mat[NewPos.second][NewPos.first]);
-*/
 
         if (NewPos != players[currentP])
         {
@@ -342,10 +338,10 @@ swap(Mat[players[currentP].second][players[currentP].first], Mat[NewPos.second][
     }// MoveTokenPlayers()
 
 	/**
-	*
-	*@brief : Set basical parameters and if they are not in the config file, they wont be replaced.
-	*
-	**/	
+	 *
+	 *@brief : Set basical parameters and if they are not in the config file, they wont be replaced.
+	 *
+	 **/	
 
     void SetDefaultParameters (map <string, unsigned> &Params)
     {
@@ -370,10 +366,10 @@ swap(Mat[players[currentP].second][players[currentP].first], Mat[NewPos.second][
     }// SetDefaultParameters()
 
 	/**
-	*
-	*@brief : Determinate if the input char is a digit or not, return boolean.
-	*
-	**/	
+	 *
+	 *@brief : Determinate if the input char is a digit or not, return boolean.
+	 *
+	 **/	
     bool isdigit(char c)
     {
         return ('0' <= c && c <= '9');
@@ -381,10 +377,10 @@ swap(Mat[players[currentP].second][players[currentP].first], Mat[NewPos.second][
 	
 
 	/**
-	*
-	*@brief : Read through the config file, read the parameter name and its value, put them into the map Params.
-	*
-	**/	
+	 *
+	 *@brief : Read through the config file, read the parameter name and its value, put them into the map Params.
+	 *
+	 **/	
     void ReadParameters (map <string, unsigned> &Params)
     {
         unsigned NbConfig;
@@ -409,10 +405,10 @@ swap(Mat[players[currentP].second][players[currentP].first], Mat[NewPos.second][
     }// ReadParameters()
 	
 	/**
-	*
-	*@brief : Main function of the game, call the function in the right order to make run the game, return the number of winner player.
-	*
-	**/	
+	 *
+	 *@brief : Main function of the game, call the function in the right order to make run the game, return the number of winner player.
+	 *
+	 **/	
     int Run()
     {
         CMatrix Mat;
@@ -437,8 +433,7 @@ swap(Mat[players[currentP].second][players[currentP].first], Mat[NewPos.second][
         {
             if (Params["tpt"])
             {
-                while(Contains(++i % 2 == 0 ? p2keys : p1keys, 8, toupper(Move)))
-                    Move = GetKey();
+                while(Move = GetKey() && Contains(p1keys, 8, toupper(Move)));
                 MoveToken(Mat, Move, ++i % 2 == 0 ? PosPlayer2 : PosPlayer1);
             }/*Given the number of turns elapsed, we move p2 or p1*/
             else
@@ -450,7 +445,7 @@ swap(Mat[players[currentP].second][players[currentP].first], Mat[NewPos.second][
 
         if(Params["NbCol"] >= 4)
             cout << string(Params["NbCol"] - 4, ' ');/* outputs spaces minus half the space "Bravo JX"
-take to align in the bottom center of the board */
+														take to align in the bottom center of the board */
         if(Params["nb_turns"])
             cout << "Bravo J" << (char)((status) + '1')
                  << '!' << endl;
@@ -466,11 +461,11 @@ take to align in the bottom center of the board */
 
 using namespace Jesuss;
 
-	/**
-	*
-	*@brief : Call the mainfunction of the game.
-	*
-	**/	
+/**
+ *
+ *@brief : Call the mainfunction of the game.
+ *
+ **/	
 int main()
 {
     return Run();
