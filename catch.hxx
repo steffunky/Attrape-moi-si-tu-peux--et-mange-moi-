@@ -56,6 +56,9 @@ const string KMAgenta= "35";
 const string KCyan   = "36";
 
 int system(const char *command);
+int rand(void);
+void srand(unsigned int seed);
+long int time(long int *timer);
 
 CPosition PosPlayer1;
 CPosition PosPlayer2;

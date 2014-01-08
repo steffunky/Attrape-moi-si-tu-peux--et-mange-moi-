@@ -520,7 +520,8 @@ namespace Jesuss
 			}
 		}
 
-		return 'X';//42
+		//char randomMove[8] = {'Q', 'W', 'E', 'A', 'D', 'Z', 'X', 'C'};
+		return p1keys[rand() % 8];//42
 	}
 
 
@@ -537,6 +538,8 @@ namespace Jesuss
         map <string, unsigned> Params;
 
         int i = 0;
+
+		srand(time((long int *)0));
         SetDefaultParameters(Params);
         ReadParameters(Params);
 
