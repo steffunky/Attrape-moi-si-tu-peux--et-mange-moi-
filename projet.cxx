@@ -20,10 +20,12 @@
 
 namespace Jesuss
 {
-
 #ifdef __unix__
+
 	/**
+	 *
 	 *@brief : Outputs a reset escape code for VT-100 terminals.
+	 *
 	 **/
     void ClearScreen()
     {
@@ -46,10 +48,11 @@ namespace Jesuss
         (void)i;
 		return c;
     }// GetKey()
+
 	/**
 	 *
 	 *@brief : Display the arena on the terminal.
-	 *@param[in] : Mat The Matrix to display.
+	 *
 	 **/
     void ShowMatrix(const CMatrix &Mat)
     {
@@ -72,8 +75,8 @@ namespace Jesuss
             }
             cout << endl;
 		}
-        cout << endl;
     }// ShowMatrix()
+
 	/**
 	 *
 	 *@brief : Get the terminal's size.
@@ -92,6 +95,7 @@ namespace Jesuss
 #endif
 
 #ifdef __MINGW32__
+
 	/**
 	 *
 	 *@brief : Clears the terminal
@@ -105,7 +109,7 @@ namespace Jesuss
 	/**
 	 *
 	 *@brief : Displays the board on windows.
-	 *@param[in] Mat : The Matrix to display.
+	 *
 	 **/
     void ShowMatrix(const CMatrix &Mat)
     {
@@ -151,7 +155,7 @@ namespace Jesuss
 
         cmd.second = cmd.second >= 5 ? cmd.second : 5;
         cmd.first = cmd.first >= 5 ? cmd.first : 5;
-    }// GetCmdInfo
+    }// GetCmdInfo()
 
 #endif
 
@@ -252,7 +256,7 @@ namespace Jesuss
 
 	/**
 	 *
-	 *@brief : Check if the char is in the char tab.
+	 *@brief : Checks if the char is in the char tab.
 	 *
 	 **/
     bool Contains(const char Tab[], unsigned size, char value)
@@ -364,6 +368,8 @@ namespace Jesuss
         Params["inf_turns"] = 0;
         Params["tpt"] = 1;
 		Params["menu"] = 0;
+		Params["ai"] = 0; //disabled
+		Params["ailevel"] = 0;//0 = easy, 1 = impossible
 
     }// SetDefaultParameters()
 
@@ -430,6 +436,11 @@ namespace Jesuss
 		
     }	
 
+	/**
+	 *
+	 *@brief : Substracts 2 positions
+	 *
+	 **/
 	pair<int, int> Substract(CPosition arg1, CPosition arg2)
 	{
 		pair<int, int> tmp;
@@ -438,25 +449,18 @@ namespace Jesuss
 		return tmp;
 	}
 
-	char IAPlay()
+	/**
+	 *
+	 *@brief : Computes the minimal number of key presses required to end the game
+	 *
+	 **/
+	int distance()
 	{
-		/*
-		  The AI determines if the minimal number of keys to be pressed is odd or even
-		  then proceeds to move towards the enemy in a way that'll make him win.
-		 */
-		usleep(500000);
-
+		usleep(400000);
 		int steps = 0;
 		pair <int, int> tmp = Substract(PosPlayer2, PosPlayer1);
 		int loc;
-		/*
-		  If the two members of tmp are strictly positive, then the IA is above and nearer to the right than the enemy loc=2
-		  if only .first is negative, then the IA is above and near to the left loc = 1
-		  if only .second is negative, then the IA is in the lower right loc = 2
-		  else he's in the lower left loc = 3
-		  if one of the two member is equal to 0, then he's aligned
-		 */
-		loc = ((tmp.second < 0) * 2) + (tmp.first < 0);
+		loc = ((tmp.second < 0) << 1) + (tmp.first < 0);
 		switch(loc)
 		{
 		case 0: // bot right
@@ -489,7 +493,20 @@ namespace Jesuss
 			}
 		}
 
-		steps += tmp.first + tmp.second;
+		steps += ABS(tmp.first) + ABS(tmp.second);
+		return steps;
+	}
+
+	/**
+	 *
+	 *@brief : Noob AI
+	 *
+	 **/
+	char AILevel0()
+	{
+		int steps = distance();
+		pair <int, int>tmp = Substract(PosPlayer2, PosPlayer1);
+		int loc = ((tmp.second < 0) << 1) + (tmp.first < 0);
 
 		if(steps % 2)
 		{
@@ -510,18 +527,89 @@ namespace Jesuss
 			switch(loc)
 			{
 			case 0:
-				return tmp.second  == 0 ? 'D': 'Q';
+				return tmp.second == 0 ? 'D': 'Q';
 			case 1:
 				return 'Q';
 			case 2:
-				return tmp.first  == 0 ? 'Z': 'X';
+				return tmp.first == 0 ? 'Z': 'X';
 			case 3:
 				return 'D';
 			}
 		}
 
-		//char randomMove[8] = {'Q', 'W', 'E', 'A', 'D', 'Z', 'X', 'C'};
-		return p1keys[rand() % 8];//42
+		/* Should never reach here */
+		return p1keys[rand() % 8];
+	}
+
+	/**
+	 *
+	 *@brief : Unbeatable AI
+	 *
+	 **/
+	char AILevel1()
+	{
+		int steps = distance();
+		pair <int, int>tmp = Substract(PosPlayer2, PosPlayer1);
+		int loc = ((tmp.second < 0) << 1) + (tmp.first < 0);
+		if (steps != 2) //we kill him
+		{
+			switch(loc)
+			{
+			case 0:
+				if (tmp.first == 0)return 'Z';
+				else if (tmp.second == 0) return 'Q';
+				else return 'A';
+			case 1:
+				if (tmp.first == 0)return 'Z';
+				else if (tmp.second == 0) return 'D';
+				else return 'E';
+			case 2:
+				if (tmp.first == 0)return 'X';
+				else if (tmp.second == 0) return 'Q';
+				else return 'W';
+			case 3:
+				if (tmp.first == 0)return 'X';
+				else if (tmp.second == 0) return 'D';
+				else return 'C';
+			}
+		}
+		else // tries to survive
+		{
+			switch(loc)
+			{
+			case 0:
+				if (ABS(tmp.first) == ABS(tmp.second))
+					return rand() % 2 ? 'Z' : 'Q';
+				else if (ABS(tmp.first) > ABS(tmp.second))
+					return rand() % 2 ? 'Z' : 'X';
+				else
+					return rand() % 2 ? 'D' : 'Q';
+			case 1:
+				if (ABS(tmp.first) == ABS(tmp.second))
+					return rand() % 2 ? 'Z' : 'D';
+				else if (ABS(tmp.first) > ABS(tmp.second))
+					return rand() % 2 ? 'Z' : 'X';
+				else
+					return rand() % 2 ? 'D' : 'Q';
+			case 2:
+				if (ABS(tmp.first) == ABS(tmp.second))
+					return rand() % 2 ? 'X' : 'Q';
+				else if (ABS(tmp.first) > ABS(tmp.second))
+					return rand() % 2 ? 'Z' : 'X';
+				else
+					return rand() % 2 ? 'D' : 'Q';
+			case 3:
+				if (ABS(tmp.first) == ABS(tmp.second))
+					return rand() % 2 ? 'X' : 'D';
+				else if (ABS(tmp.first) > ABS(tmp.second))
+					return rand() % 2 ? 'Z' : 'X';
+				else
+					return rand() % 2 ? 'D' : 'Q';
+			}
+		}
+
+		/* Should never reach here */
+		return p1keys[rand() % 8];
 	}
 
 
@@ -559,8 +647,8 @@ namespace Jesuss
         {
             if (Params["tpt"])
             {
-				if(Params["ia"] && i % 2 == 1)
-					Move = IAPlay();
+				if(Params["ai"] && i % 2 == 1)
+					Move = Params["ailevel"] == 0 ? AILevel0() : AILevel1();
 				else
 					while((Move = GetKey()) && !Contains(p1keys, 8, toupper(Move)));
                 MoveToken(Mat, Move, ++i % 2 == 0 ? PosPlayer2 : PosPlayer1);

@@ -13,12 +13,15 @@
 #ifndef __CATCH_HPP__
 #define __CATCH_HPP__
 
-#include <string>
+#define ABS(x) (x < 0 ? -x : x)
+
 #include <iostream>
-#include <vector>
-#include <fstream>
-#include <map>
 #include <unistd.h>
+#include  <fstream>
+#include  <cassert>
+#include   <string>
+#include   <vector>
+#include      <map>
 
 #ifdef __unix__
 #include <sys/ioctl.h>
@@ -30,7 +33,6 @@
 int getch();
 #endif
 
-#include <cassert>
 
 using namespace std;
 
@@ -56,9 +58,9 @@ const string KMAgenta= "35";
 const string KCyan   = "36";
 
 int system(const char *command);
-int rand(void);
-void srand(unsigned int seed);
-long int time(long int *timer);
+int rand(void) __THROW;
+void srand(unsigned int seed) __THROW;
+long int time(long int *timer) __THROW;
 
 CPosition PosPlayer1;
 CPosition PosPlayer2;

@@ -7,4 +7,5 @@ YPosPlay2: 0
 #nb_turns: 50
 inf_turns: 0
 tpt: 1
-ia: 1
+ai: 1
+ailevel: 1
