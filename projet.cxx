@@ -457,44 +457,8 @@ namespace Jesuss
 	int distance()
 	{
 		usleep(400000);
-		int steps = 0;
 		pair <int, int> tmp = Substract(PosPlayer2, PosPlayer1);
-		int loc;
-		loc = ((tmp.second < 0) << 1) + (tmp.first < 0);
-		switch(loc)
-		{
-		case 0: // bot right
-			while(tmp.first * tmp.second)
-			{
-				--tmp.first;
-				--tmp.second;
-				++steps;
-			}
-		case 1: // bot left
-			while(tmp.first * tmp.second)
-			{
-				++tmp.first;
-				--tmp.second;
-				++steps;
-			}
-		case 2: // +- top right
-			while(tmp.first * tmp.second)
-			{
-				--tmp.first;
-				++tmp.second;
-				++steps;
-			}
-		case 3: //-- top left
-			while(tmp.first * tmp.second)
-			{
-				++tmp.first;
-				++tmp.second;
-				++steps;
-			}
-		}
-
-		steps += ABS(tmp.first) + ABS(tmp.second);
-		return steps;
+		return MAX(ABS(tmp.first), ABS(tmp.second));
 	}
 
 	/**
@@ -663,7 +627,7 @@ namespace Jesuss
         if(Params["NbCol"] >= 4)
             cout << string(Params["NbCol"] - 4, ' ');/* outputs spaces minus half the space "Bravo JX"
 														take to align in the bottom center of the board */
-        if(Params["nb_turns"])
+		if(Params["nb_turns"])
             cout << "Bravo J" << (char)((status) + '1')
                  << '!' << endl;
         else
