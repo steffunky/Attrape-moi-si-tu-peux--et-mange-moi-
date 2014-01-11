@@ -1,12 +1,12 @@
 /**
  *
- *@file : catch.hpp
+ *@file : catch.hxx
  *
  *@author : Mickael BRUNEL, Anthony ALEGRE, Nabil BOUTEMEUR, Stéphen ABELLO
  *
  *@date : 18/12/2013
  *
- *@brief : Initialisation pour main.cpp
+ *@brief : Initialisation for projet.cxx
  *
 **/
 
@@ -51,9 +51,29 @@ int system(const char *command);
 /* lin/win.cxx */
 namespace Jesuss
 {
+/**
+ *
+ *@brief : Outputs a reset escape code.
+ *
+ **/
 	void ClearScreen();
+/**
+ *
+ *@brief : Returns the pressed key without having to press enter.
+ *
+ **/
 	char GetKey();
+/**
+ *
+ *@brief : Displays the board.
+ *
+ **/
 	void ShowMatrix(const CMatrix &Mat);
+/**
+ *
+ *@brief : Get the terminal's size's informations. 
+ *
+ **/	
 	void GetCmdInfo(CPosition &cmdinfo);
 }
 
