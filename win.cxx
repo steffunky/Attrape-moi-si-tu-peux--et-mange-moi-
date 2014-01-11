@@ -23,7 +23,10 @@ void ShowMatrix(const CMatrix &Mat)
 	for (CVLine i : Mat)
 	{
 		for (char j : i)
-			matrixTxt += j + '|';
+		{
+			matrixTxt += j;
+			matrixTxt += '|';
+		}
 		matrixTxt += '\n';
 	}
 	/* 
