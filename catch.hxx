@@ -49,10 +49,13 @@ typedef pair<unsigned, unsigned> CPosition;
 int system(const char *command);
 
 /* lin/win.cxx */
-void ClearScreen();
-char GetKey();
-void ShowMatrix(const CMatrix &Mat);
-void GetCmdInfo(CPosition &cmdinfo);
+namespace Jesuss
+{
+	void ClearScreen();
+	char GetKey();
+	void ShowMatrix(const CMatrix &Mat);
+	void GetCmdInfo(CPosition &cmdinfo);
+}
 
 /* ai.cxx */
 char AILevel0(CPosition &PosPlayer1, CPosition &PosPlayer2);

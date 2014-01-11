@@ -1,6 +1,7 @@
 #ifdef __MINGW32__
 #include "catch.hxx"
-
+namespace Jesuss
+{
 /**
  *
  *@brief : Clears the terminal
@@ -64,5 +65,5 @@ void GetCmdInfo(CPosition &cmd)
 	cmd.second = cmd.second >= 5 ? cmd.second : 5;
 	cmd.first = cmd.first >= 5 ? cmd.first : 5;
 }// GetCmdInfo()
-
+}
 #endif

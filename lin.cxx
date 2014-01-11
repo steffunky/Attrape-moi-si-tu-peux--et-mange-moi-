@@ -1,6 +1,7 @@
 #ifdef __unix__
 #include "catch.hxx"
-
+namespace Jesuss
+{
 /**
  *
  *@brief : Outputs a reset escape code for VT-100 terminals.
@@ -73,5 +74,5 @@ void GetCmdInfo(CPosition &cmdinfo)
 	cmdinfo.first = cmd[1] >= 5 ? cmd[1] : 5;
 	cmdinfo.second = cmd[0] >= 5 ? cmd[0] : 5;
 }// GetCmdInfo()
-
+}
 #endif
