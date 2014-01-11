@@ -1,23 +1,27 @@
+/**
+ *
+ *@file : lin.cxx
+ *
+ *@author : Mickael BRUNEL, Anthony ALEGRE, Nabil BOUTEMEUR, Stéphen ABELLO
+ *
+ *@date : 08/01/2014
+ *
+ *@brief : Specifics functions used for GjkNU Linux.
+ *
+**/
+
 #ifdef __unix__
 #include "catch.hxx"
 namespace Jesuss
 {
-/**
- *
- *@brief : Outputs a reset escape code for VT-100 terminals.
- *
- **/
+
 void ClearScreen()
 {
 	cout << "\033[2J\033[1;1H";
 
 }// ClearScreen()
 
-/**
- *
- *@brief : Returns the pressed key without having to press enter on unix.
- *
- **/
+
 char GetKey()
 {
 	char c;
@@ -29,11 +33,7 @@ char GetKey()
 	return c;
 }// GetKey()
 
-/**
- *
- *@brief : Display the arena on the terminal.
- *
- **/
+
 void ShowMatrix(const CMatrix &Mat)
 {
 	const char KTokenPlayer1 = 'X';
@@ -60,11 +60,7 @@ void ShowMatrix(const CMatrix &Mat)
 	}
 }// ShowMatrix()
 
-/**
- *
- *@brief : Get the terminal's size.
- *
- **/
+
 void GetCmdInfo(CPosition &cmdinfo)
 {
 	unsigned short cmd[2]; // abstraction of the ttysize struct
