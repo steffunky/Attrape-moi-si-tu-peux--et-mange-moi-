@@ -1,22 +1,26 @@
+/**
+ *
+ *@file : 
+ *
+ *@author : Mickael BRUNEL, Anthony ALEGRE, Nabil BOUTEMEUR, Stéphen ABELLO
+ *
+ *@date : 08/01/2014
+ *
+ *@brief : Specifics functions used for windows.
+ *
+**/
+
 #ifdef __MINGW32__
 #include "catch.hxx"
 namespace Jesuss
 {
-/**
- *
- *@brief : Clears the terminal
- *
- **/
+
 void ClearScreen()
 {
 	system("cls");
 }// ClearScreen()
 
-/**
- *
- *@brief : Displays the board on windows.
- *
- **/
+
 void ShowMatrix(const CMatrix &Mat)
 {
 	ClearScreen();
@@ -37,21 +41,13 @@ void ShowMatrix(const CMatrix &Mat)
 	cout << matrixTxt;
 }// ShowMatrix()
 
-/**
- *
- *@brief : Return the pressed key without having to press enter on windows.
- *
- **/
+
 char GetKey()
 {
 	return getch();
 }// GetKey()
 
-/**
- *
- *@brief : Get the terminal's size's information and use it to dimension the arena on windows. 
- *
- **/
+
 void GetCmdInfo(CPosition &cmd)
 {
 	CONSOLE_SCREEN_BUFFER_INFO cmdinfo;
