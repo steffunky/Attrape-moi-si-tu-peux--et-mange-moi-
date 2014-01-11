@@ -316,7 +316,7 @@ namespace Jesuss
 		int status;
         int i = 0;
 
-		srand(time((long int *)0));
+        srand(time(NULL));
         SetDefaultParameters(Params);
         ReadParameters(Params);
 
