@@ -1,3 +1,15 @@
+/**
+ *
+ *@file : ai.cxx
+ *
+ *@author : Mickael BRUNEL, Anthony ALEGRE, Nabil BOUTEMEUR, Stéphen ABELLO
+ *
+ *@date : 09/01/2014
+ *
+ *@brief : Two AI for the game.
+ *
+**/
+
 #include "catch.hxx"
 /**
  *
