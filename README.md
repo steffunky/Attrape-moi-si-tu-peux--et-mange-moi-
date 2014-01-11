@@ -17,8 +17,8 @@ If not found, the program will fall back on its default values.
  
 |Variable   | Val. par défaut       | Description                          |   
 | --------- |:---------------------:| ------------------------------------:|   
-|NbLine     | Hauteur du term   - 3 | Number of lines                      |   
-|NbCol      | Largeur du term /2 -1 | Number of Columns                    |   
+|NbLine     | Terminal's height - 3 | Number of lines                      |   
+|NbCol      | Terminal's width /2 -1| Number of Columns                    |   
 |XPosPlay1  | 0                     | Player 1's position on the X axis    |   
 |YPosPlay1  | NbLine - 1            | Player 1's position on the Y axis    |   
 |XPosPlay2  | NbCol - 1             | Player 2's position on the X axis    |   
