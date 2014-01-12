@@ -56,7 +56,7 @@ void GetCmdInfo(CPosition &cmd)
 
 	cmd.first = cmdinfo.srWindow.Right - cmdinfo.srWindow.Left + 1;
 	cmd.second = cmdinfo.srWindow.Bottom - cmdinfo.srWindow.Top + 1;
-	assert(cmd.first >= 5 && assert cmd.second >= 5);
+	assert(cmd.first >= 5 && cmd.second >= 5);
 
 	cmd.second = cmd.second >= 5 ? cmd.second : 5;
 	cmd.first = cmd.first >= 5 ? cmd.first : 5;
