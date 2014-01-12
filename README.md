@@ -40,8 +40,10 @@ If not found, the program will fall back on its default values.
  Open a terminal, then    
  `git clone https://github.com/steffunky/Attrape-moi-si-tu-peux--et-mange-moi-.git`    
  `cd Attrape-moi-si-tu-peux--et-mange-moi-`    
- `make`    
- 
+ `make`  
+   Or:  
+   `make debug`
+   This will make the game crash if a function returns an unexpected value.
  To play:    
  `./catch_me`    
  
