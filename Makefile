@@ -11,6 +11,9 @@ all: $(NAME)
 $(NAME):
 	$(CC) $(FLAGS) -o $(NAME) $(SRC)
 
+debug:
+	$(CC) $(FLAGS) -DDEBUG -o $(NAME) $(SRC)
+
 clean:
 	rm -f $(NAME) *~ #*#
 
